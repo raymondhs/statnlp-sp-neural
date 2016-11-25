@@ -84,7 +84,6 @@ bash noise_test.sh <lang1> <lang2> ... <langN>
 
 ## Contact
 
-Raymond Hendy Susanto and Wei Lu
-Singapore University of Technology and Design
+Raymond Hendy Susanto and Wei Lu, Singapore University of Technology and Design
 
 Please drop an email at raymond_susanto@sutd.edu.sg for questions.

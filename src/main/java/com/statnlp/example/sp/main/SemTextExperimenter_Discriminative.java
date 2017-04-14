@@ -47,7 +47,7 @@ public class SemTextExperimenter_Discriminative {
     static boolean skipTest = false;
     static boolean printFeats = false;
     static boolean testOnTrain = false;
-    static boolean extractFromTest = true;
+    static boolean precomputeTestFeatureIdx = false;
     static String lang;
     static double learningRate = 0.01;
     static int numIterations = 100;
@@ -82,6 +82,7 @@ public class SemTextExperimenter_Discriminative {
                 NetworkConfig.NUM_THREADS = Integer.parseInt(args[++i]);
             } else if(opt.equals("-neural")) {
                 NetworkConfig.USE_NEURAL_FEATURES = true;
+                precomputeTestFeatureIdx = true;
             } else if(opt.equals("-lr")) {
                 learningRate = Double.parseDouble(args[++i]);
                 NeuralConfig.LEARNING_RATE = learningRate;
@@ -133,8 +134,10 @@ public class SemTextExperimenter_Discriminative {
                 fixPretrain = true;
             } else if(opt.equals("-sequential-touch")) {
                 NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
-            } else if(opt.equals("-skip-test-extract")) {
-                extractFromTest = false;
+            } else if(opt.equals("-ratio-stop-criterion")){
+            	NetworkConfig.RATIO_STOP_CRIT = true;
+            } else if(opt.equals("-precompute-test-feature-index")) {
+                precomputeTestFeatureIdx = true;
             } else if(opt.equals("-validation")) {
                 validation = true;
             } else if(opt.equals("-noise-test")) {
@@ -144,11 +147,6 @@ public class SemTextExperimenter_Discriminative {
                 System.exit(1);
             }
             i++;
-        }
-        if(lang.equals("en")) {
-            NetworkConfig.RATIO_STOP_CRIT = true;
-            NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
-            extractFromTest = true;
         }
     }
     
@@ -321,7 +319,11 @@ public class SemTextExperimenter_Discriminative {
             	System.out.println("Setting #iter to 0 for touch..");
             }
             
-            if (extractFromTest) {
+            if (precomputeTestFeatureIdx) {
+            	// This will train the model strictly on the 600 training instances.
+            	// However, it also allocates indices for features that can be extracted from the test instances.
+            	// This has no effect for non-neural features (unseen discrete features will be ignored during prediction),
+            	// but will affect neural features (such neural weights are always computable by neural network)
                 model.train(all_instances, size, numIterations, modelName);
             } else {
                 model.train(train_instances, size, numIterations, modelName);

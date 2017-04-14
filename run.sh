@@ -24,11 +24,12 @@ for window in 2 1 0; do
 
 pretrain="-pretrain model/orig.$lang.99.model"
 if [ $lang = "en" ]; then
-pretrain="-pretrain model/orig.$lang.93.model"
+  pretrain="-pretrain model/orig.$lang.93.model"
+  use_ratio_stop_criterion="-ratio-stop-criterion"
 fi
 saveprefix="$lang"-window$window
 
-time java -Xmx144g -Djava.library.path=/usr/local/lib -cp bin/sp.jar com.statnlp.example.sp.main.SemTextExperimenter_Discriminative -thread $thread $config -lang $lang -neural -optim $optim -lr $lr -l2 $L2 -iter $iter -save-iter $saveiter -save-prefix $saveprefix -num-layer $num_layer -hidden $hidden -embedding $emb -embedding-size $embsize -window $window -dropout $dropout $pretrain $fixpre > logs/"$saveprefix".out 2> logs/"$saveprefix".err
+time java -Xmx144g -Djava.library.path=/usr/local/lib -cp bin/sp.jar com.statnlp.example.sp.main.SemTextExperimenter_Discriminative -thread $thread $config -lang $lang -neural -optim $optim -lr $lr -l2 $L2 -iter $iter -save-iter $saveiter -save-prefix $saveprefix -num-layer $num_layer -hidden $hidden -embedding $emb -embedding-size $embsize -window $window -dropout $dropout $pretrain $fixpre $use_ratio_stop_criterion > logs/"$saveprefix".out 2> logs/"$saveprefix".err
 
   done
 done

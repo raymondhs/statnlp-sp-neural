@@ -58,7 +58,8 @@ public class SemTextExperimenter_Discriminative {
     static String pretrainPath = "";
     static boolean fixPretrain = false; 
     static boolean validation = false;
-    static boolean useSynTest = false;
+    static boolean isDecoding = false;
+    static String testSet = "test";
     
     private static void parse(String args[]) throws FileNotFoundException {
         //set default values
@@ -96,7 +97,7 @@ public class SemTextExperimenter_Discriminative {
             	neuralSavePrefix = args[++i];
             } else if(opt.equals("-debug")) {
                 debug = true;
-            } else if(opt.equals("-skip-test")) {
+            } else if(opt.equals("-train")) {
                 skipTest = true;
             } else if(opt.equals("-print-feats")) {
                 printFeats = true;
@@ -140,8 +141,9 @@ public class SemTextExperimenter_Discriminative {
                 precomputeTestFeatureIdx = true;
             } else if(opt.equals("-validation")) {
                 validation = true;
-            } else if(opt.equals("-noise-test")) {
-                useSynTest = true;
+            } else if(opt.equals("-decode")) {
+            	testSet = args[++i]; // "test", "syn"
+                isDecoding = true;
             } else {
                 System.err.println("Unknown option: " + args[i]);
                 System.exit(1);
@@ -152,7 +154,7 @@ public class SemTextExperimenter_Discriminative {
     
     private static void printSettings() {
         System.out.println("STATNLP CONFIGURATIONS:");
-        System.out.println("* Mode: " + (debug ? "Debug" : validation ? "Validation" : useSynTest ? "Robustness Test" : "Training" ));
+        System.out.println("* Mode: " + (debug ? "Debug" : validation ? "Validation" : isDecoding ? "Decoding" : "Training" ));
         System.out.println("* #iterations: " + numIterations);
         System.out.println("* Optimizer: " + optim);
         if(!optim.equals("lbfgs")) {
@@ -225,11 +227,11 @@ public class SemTextExperimenter_Discriminative {
         ArrayList<SemTextInstance> insts_test_clone = null;
         ArrayList<SemTextInstance> insts_test = null;
         
-        if (useSynTest) {
+        if (testSet.equals("syn")) {
             String syn_inst_filename = "data/synonyms/geoFunql-"+lang+"-syn.corpus";
             insts_test_clone = SemTextInstanceReader.read(syn_inst_filename, dm, test_ids, false);
             insts_test = SemTextInstanceReader.read(syn_inst_filename, dm, test_ids, false);
-        } else {
+        } else { // standard test set
             insts_test_clone = SemTextInstanceReader.read(inst_filename, dm, test_ids, false);
             insts_test = SemTextInstanceReader.read(inst_filename, dm, test_ids, false);
         }
@@ -314,7 +316,7 @@ public class SemTextExperimenter_Discriminative {
                 }
             }
             
-            if (useSynTest) {
+            if (isDecoding) {
             	numIterations = 0;
             	System.out.println("Setting #iter to 0 for touch..");
             }
@@ -329,7 +331,7 @@ public class SemTextExperimenter_Discriminative {
                 model.train(train_instances, size, numIterations, modelName);
             }
             
-            if (useSynTest) {
+            if (isDecoding) {
             	String neuralModelName = "";
                 if (!neuralSavePrefix.equals("")) {
                 	neuralModelName = neuralSavePrefix;

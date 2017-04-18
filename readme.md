@@ -56,6 +56,14 @@ Download the .pkl files from [Polyglot]( https://sites.google.com/site/rmyeid/pr
 bash prepare_torch.sh
 ```
 
+## Running the code
+
+The following script will pre-train a hybrid tree model, train the neural network, and perform evaluation on the standard GeoQuery dataset.
+
+```
+bash run-general.sh <lang1> <lang2> ... <langN>
+```
+
 ## Reproducing the experimental results
 
 First, pre-train the hybrid tree models (Lu, 2015) for multiple languages:

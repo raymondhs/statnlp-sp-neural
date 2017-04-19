@@ -1,5 +1,5 @@
 set -e -x
-debug="-debug"
+debug=""
 thread=16
 iter=100
 saveiter=50
